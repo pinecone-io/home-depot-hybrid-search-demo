@@ -45,16 +45,17 @@ def app():
 
         for i, res in enumerate(top_k_results.results):
             rel = q_rels_map.get(res.doc_id, 0) if q_rels_map else None
-            st.write(generate_html(res.metadata["name"], res.metadata["description"], i +  1, query, rel), unsafe_allow_html=True)
+            st.write(generate_html(res.metadata["name"], res.metadata["description"], i +  1, query, rel,
+                                   res.score, res.dense_score, res.sparse_score), unsafe_allow_html=True)
 
 
-def generate_html(name, description, rank, query, rel):
+def generate_html(name, description, rank, query, rel, score, dense_score, sparse_score):
     # Split description into tokens and limit it to 50 tokens
-    tokens = description.split()[:50]
+    tokens = description.split()[:100]
     truncated_description = " ".join(tokens)
 
     # Add ellipsis if description was truncated
-    if len(tokens) == 50:
+    if len(tokens) == 100:
         truncated_description += "..."
 
     # Split the query into tokens
@@ -78,6 +79,7 @@ def generate_html(name, description, rank, query, rel):
     html = f"""
     <div style="{gold_frame_style}">
         <h5 style="font-weight: bold;">{rank}) {name}</h5>
+        <p>score: {score} \t dense: {dense_score} \t sparse: {sparse_score}</p>
         <p>{truncated_description}</p>
     </div>
     """
